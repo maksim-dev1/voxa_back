@@ -1,0 +1,31 @@
+# Runs on nexus: storage-relay + worker only. Postgres (voxa-pg, port
+# 5438) and Redis are already provisioned separately (diskman / shared
+# nexus redis) — this compose file does not manage them, it just points
+# at them via DATABASE_URL / REDIS_URL in .env.
+#
+# voxa-api is NOT here — it deploys on Pi via Dokploy from api/Dockerfile.
+
+services:
+  storage-relay:
+    build: ./storage-relay
+    env_file: .env
+    ports:
+      - "8100:8100"
+    volumes:
+      - /data/voxa/recordings:/data/voxa/recordings
+    restart: unless-stopped
+
+  worker:
+    build: ./worker
+    env_file: .env
+    volumes:
+      - /data/voxa/recordings:/data/voxa/recordings
+      - /data/voxa/models:/data/voxa/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped

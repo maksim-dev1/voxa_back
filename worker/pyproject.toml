@@ -1,0 +1,14 @@
+[project]
+name = "voxa-worker"
+version = "0.1.0"
+description = "GPU transcription + diarization worker for voxa (runs on nexus)"
+requires-python = ">=3.10"
+dependencies = [
+    "faster-whisper>=1.0",
+    "pyannote.audio>=3.1",
+    "redis>=5.0",
+    "psycopg[binary]>=3.1",
+]
+
+[tool.setuptools]
+py-modules = ["main", "transcribe", "diarize", "config", "db", "queue_consumer"]

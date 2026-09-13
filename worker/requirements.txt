@@ -1,0 +1,10 @@
+# Pinned so a rebuild doesn't silently pick up a torch/ctranslate2 combo
+# that stops agreeing with the nexus driver (580.173.02, CUDA 13 API,
+# backward-compatible with CUDA 12.x runtime builds below).
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.4.1+cu121
+
+faster-whisper==1.0.3
+pyannote.audio==3.3.2
+redis==5.0.8
+psycopg[binary]==3.2.3

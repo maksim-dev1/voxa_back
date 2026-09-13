@@ -1,0 +1,14 @@
+# Go build artifacts
+api/api
+api/voxa-api
+storage-relay/storage-relay
+storage-relay/voxa-storage-relay
+
+# Python
+worker/__pycache__/
+worker/.venv/
+worker/*.egg-info/
+
+# Local env files
+.env
+*.env.local
