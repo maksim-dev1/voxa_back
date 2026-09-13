@@ -10,5 +10,11 @@ pyannote.audio==3.3.2
 # pyannote.audio 3.3.2 still calls the old use_auth_token API, removed in
 # huggingface_hub 1.x — pin below that or pipeline loading breaks.
 huggingface_hub==0.23.4
+# Transitive pyannote.audio dep (its VAD module imports it) that pip never
+# resolves on its own from pyannote.audio's declared deps. Was masked
+# during earlier testing because the pipeline failed on the HF_TOKEN gate
+# before it ever reached this import — surfaced only once the gate/license
+# issues were fixed and the pipeline actually loaded.
+matplotlib==3.9.2
 redis==5.0.8
 psycopg[binary]==3.2.3
