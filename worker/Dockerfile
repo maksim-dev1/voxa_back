@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # voxa-worker — GPU transcription + diarization, runs on nexus.
 # cudnn-runtime base matches what ctranslate2 (faster-whisper's backend)
 # needs at runtime; driver on nexus (580.173.02) is new enough to run
@@ -11,7 +12,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+# A cache mount (not --no-cache-dir) so pip's download cache survives
+# across builds even when this layer gets invalidated by a
+# requirements.txt change — without it, every edit re-downloads the
+# whole list from scratch (torch alone is 2GB+), turning a one-line pin
+# bump into an 11+ minute rebuild instead of a few seconds for the
+# actually-changed packages.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip3 install -r requirements.txt
 
 COPY . .
 
