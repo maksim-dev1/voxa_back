@@ -3,8 +3,12 @@
 # backward-compatible with CUDA 12.x runtime builds below).
 --extra-index-url https://download.pytorch.org/whl/cu121
 torch==2.4.1+cu121
+torchaudio==2.4.1+cu121
 
 faster-whisper==1.0.3
 pyannote.audio==3.3.2
+# pyannote.audio 3.3.2 still calls the old use_auth_token API, removed in
+# huggingface_hub 1.x — pin below that or pipeline loading breaks.
+huggingface_hub==0.23.4
 redis==5.0.8
 psycopg[binary]==3.2.3
