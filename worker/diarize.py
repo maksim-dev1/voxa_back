@@ -17,8 +17,17 @@ class Diarizer:
         )
 
     def diarize(self, audio_path: str) -> list[tuple[float, float, str]]:
-        """Returns (start, end, speaker_label) turns."""
-        diarization = self._pipeline(audio_path)
+        """Returns (start, end, speaker_label) turns. Recordings with no
+        detected speech (silence, pure tone, music-only) make pyannote's
+        internal clustering blow up with `max() arg is an empty sequence`
+        instead of returning zero turns — treat that as "no speakers
+        found" rather than failing the whole job."""
+        try:
+            diarization = self._pipeline(audio_path)
+        except ValueError as exc:
+            log.warning("diarization found no speech in %s: %s", audio_path, exc)
+            return []
+
         turns = []
         for turn, _, speaker in diarization.itertracks(yield_label=True):
             turns.append((turn.start, turn.end, speaker))
