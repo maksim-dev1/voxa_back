@@ -15,6 +15,7 @@ import sys
 
 import config
 import db
+from audio_convert import as_wav
 from diarize import Diarizer, merge_speakers
 from queue_consumer import QueueConsumer
 from transcribe import Transcriber
@@ -41,8 +42,13 @@ def process_job(job_id: str, database: db.Db, transcriber: Transcriber, diarizer
     database.mark_processing(job_id)
 
     try:
-        segments = transcriber.transcribe(audio_path)
-        turns = diarizer.diarize(audio_path)
+        # Both models get the same WAV copy — faster-whisper can decode
+        # the original m4a fine on its own, but pyannote's soundfile
+        # backend can't read AAC at all, so convert once up front rather
+        # than have each step handle formats differently.
+        with as_wav(audio_path) as wav_path:
+            segments = transcriber.transcribe(wav_path)
+            turns = diarizer.diarize(wav_path)
         segments = merge_speakers(segments, turns)
         database.mark_done(job_id, segments)
         log.info("job %s done: %d segments", job_id, len(segments))
